@@ -104,10 +104,7 @@ public:
         --length;
     }
 
-    void insert_middle(const T& value) {
-        size_t middle_index = length / 2; // Вычисляем индекс середины массива
-        insert(middle_index, value); // Вставляем значение в середину
-    }
+
 
     void shrink_to_fit() { //метод для очищения памяти в случаем если выделено слишком много ячеек
        if (length < capacity) { 
@@ -322,10 +319,7 @@ public:
        ++length; 
    }
 
-    void insert_middle(const T& value) {
-       size_t middle_index = length / 2; // Вычисляем индекс середины списка
-       insert(middle_index, value); // Вставляем значение в середину
-   }
+
 
    void erase(size_t index) { 
        if (index >= length) throw std::out_of_range("Index out of range"); 
@@ -463,10 +457,7 @@ public:
         ++length;
     }
 
-    void insert_middle(const T& value) {
-        size_t middle_index = length / 2; // Вычисляем индекс середины списка
-        insert(middle_index, value); // Вставляем значение в середину
-    }
+
 
     void erase(size_t index) {
         if (index >= length) throw std::out_of_range("Index out of range");
@@ -534,7 +525,7 @@ int main() {
     arr.print();  
     
     //поменять на автоматический подсчёт
-    arr.insert_middle(20);
+    arr.insert(arr.size() / 2, 20);
     std::cout << "Вывод содержимого с 20 в середине " << '\n';
     arr.print();  
 
@@ -566,7 +557,7 @@ int main() {
     list.print(); 
 
     std:: cout << "Вывод однонаправленного списка с 4 в середине: " << '\n';
-    list.insert_middle(4);
+    list.insert(arr.size() / 2, 4);
     list.print(); 
 
     std:: cout << "Вывод однонаправленного списка с 30 в конце: " << '\n';
@@ -584,7 +575,7 @@ int main() {
 
     std:: cout << "Двунаправленный список с 4 в середине и удаленным третьим элементом " << '\n';
     doubleList.erase(2); 
-    doubleList.insert_middle(4);
+    doubleList.insert(arr.size() / 2, 4);
     doubleList.print();
 
     
