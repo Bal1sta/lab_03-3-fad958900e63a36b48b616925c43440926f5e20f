@@ -1,0 +1,65 @@
+name: 'C++ CI on macOS'
+
+on:
+  push:
+    branches:
+      - main
+      - feature/github_actions
+
+jobs:
+  build:
+    runs-on: macos-latest  # Используем macOS для выполнения работы
+    permissions:
+      contents: write  # Необходимое разрешение для создания релиза
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - name: Install dependencies
+        run: brew install cmake boost
+
+      - name: Configure CMake
+        run: cmake . -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build project
+        run: cmake --build .
+
+      - name: Run tests
+        run: ctest --output-on-failure
+
+      - name: Check existing tags
+        id: check_tags
+        run: |
+          if git tag -l | grep -q "${{ github.run_number }}"; then
+            echo "Tag already exists. Skipping release creation."
+            echo "::set-output name=release_exists::true"
+          else
+            echo "::set-output name=release_exists::false"
+          fi
+
+      - name: Create Release
+        id: create_release
+        if: steps.check_tags.outputs.release_exists == 'false'
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.run_number }}-${{ github.sha }}   # Уникальный тег с SHA
+          release_name: Release ${{ github.run_number }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Asset
+        id: upload-release-asset
+        if: steps.check_tags.outputs.release_exists == 'false'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./MyExecutable   # Убедитесь, что путь правильный к вашему исполняемому файлу!
+          asset_name: MyExecutable       # Имя артефакта в релизе
+          asset_content_type: application/octet-stream  
